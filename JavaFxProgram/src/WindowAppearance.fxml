@@ -1,0 +1,40 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<?import javafx.scene.control.*?>
+<?import javafx.scene.layout.*?>
+<GridPane alignment="center" hgap="10" prefHeight="402.0" prefWidth="411.0" vgap="10" xmlns="http://javafx.com/javafx/8.0.171" xmlns:fx="http://javafx.com/fxml/1" fx:controller="Controller">
+    <columnConstraints>
+        <ColumnConstraints />
+    </columnConstraints>
+    <rowConstraints>
+        <RowConstraints />
+        <RowConstraints />
+    </rowConstraints>
+    <AnchorPane prefHeight="457.0" prefWidth="365.0" GridPane.rowIndex="1">
+        <Button fx:id="findText" layoutX="245.0" layoutY="136.0" mnemonicParsing="false" onAction="#pressButton" text="Найти" />
+        <Button fx:id="getFolderButton" layoutX="221.0" layoutY="33.0" mnemonicParsing="false" onAction="#pressButton" text="Выбрать папку" />
+        <Label layoutX="14.0" layoutY="38.0" text="Выберите папку для поиска файлов:" />
+        <Label layoutX="14.0" layoutY="80.0" text="Введите текст для поиска:" />
+        <TextField fx:id="getText" layoutX="221.0" layoutY="75.0" prefHeight="25.0" prefWidth="98.0" />
+        <Label layoutX="14.0" layoutY="116.0" text="Выберите расширение файлов:" />
+        <RadioButton fx:id="defaultExtension" layoutX="14.0" layoutY="141.0" mnemonicParsing="false" onAction="#radioBtnChanged" selected="true" text="txt">
+         <toggleGroup>
+            <ToggleGroup fx:id="RadioGroup" />
+         </toggleGroup>
+        </RadioButton>
+        <RadioButton fx:id="userExtension" layoutX="70.0" layoutY="141.0" mnemonicParsing="false" onAction="#radioBtnChanged" text="другое:" toggleGroup="$RadioGroup" />
+        <TextField fx:id="userExtensionTxtFld" disable="true" layoutX="148.0" layoutY="137.0" prefHeight="25.0" prefWidth="39.0" />
+        <Separator layoutX="4.0" layoutY="162.0" prefHeight="25.0" prefWidth="371.0" />
+        <AnchorPane layoutY="222.0" prefHeight="280.0" prefWidth="365.0">
+            <TreeView fx:id="treeFiles" layoutX="14.0" layoutY="35.0" prefHeight="164.0" prefWidth="162.0" />
+            <Label layoutX="138.0" layoutY="6.0" text="Результаты поиска:" />
+            <TextArea layoutX="199.0" layoutY="35.0" prefHeight="119.0" prefWidth="162.0" />
+            <Button layoutX="199.0" layoutY="162.0" mnemonicParsing="false" prefHeight="24.0" prefWidth="61.0" text="Вперёд" />
+            <Button layoutX="301.0" layoutY="163.0" mnemonicParsing="false" prefHeight="25.0" prefWidth="61.0" text="Назад" />
+            <Button layoutX="199.0" layoutY="199.0" mnemonicParsing="false" prefHeight="24.0" prefWidth="106.0" text="Выделить всё" />
+            <Button layoutX="199.0" layoutY="235.0" mnemonicParsing="false" prefHeight="25.0" prefWidth="162.0" text="Открыть в новой вкладке" />
+        </AnchorPane>
+        <Label layoutX="14.0" layoutY="185.0" text="Прогресс выполнения:" />
+        <ProgressBar layoutX="11.0" layoutY="204.0" prefHeight="18.0" prefWidth="329.0" progress="0.0" />
+    </AnchorPane>
+</GridPane>

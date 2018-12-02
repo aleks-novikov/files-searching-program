@@ -1,64 +1,36 @@
 package filesSearching;
 
-import java.io.BufferedReader;
-import java.io.File;
-import java.io.FileReader;
-import java.util.*;
+import java.io.IOException;
+import java.nio.file.Files;
+import java.nio.file.Path;
+import java.nio.file.Paths;
+import java.util.List;
+import java.util.TreeMap;
+import java.util.stream.Collectors;
 
 public class FilesSearching {
-    public static String[] filesSearching(File folder, String text, String extension) {
-        File[] relevantFiles = folder.listFiles((dir, name) -> name.endsWith(extension));
-        if (relevantFiles != null) {
-            return lookingForTheText(relevantFiles, text);
-
-
-        }
-        return null;
+    public static List<Path> filesSearching(String rootFolder, String text, String extension) throws IOException {
+        return Files.walk(Paths.get(rootFolder))
+                .filter(f -> f.toString().endsWith(extension) && getContent(f, text))
+                .collect(Collectors.toList());
     }
 
-    public static String[] lookingForTheText(File[] files, String text) {
-        String line;
-        List<String> finalFilesList = new LinkedList<>();
-        Map<String, List> filesMap = new HashMap<>();
-
-        for (File file : files) {
-            try (BufferedReader br = new BufferedReader(new FileReader(file))) {
-                while ((line = br.readLine()) != null) {
-                    if (line.contains(text)) {
-                        getFolder(file, filesMap);
-
-                        finalFilesList.add(file.toString());
-                    }
-                }
-            } catch (Exception e) {
-                e.printStackTrace();
-            }
+    private static boolean getContent(Path file, String text) {
+        try {
+            return new String(Files.readAllBytes(file)).contains(text);
+        } catch (IOException e) {
+            e.printStackTrace();
         }
-
-        if (finalFilesList.size() != 0) {
-            String[] str = new String[finalFilesList.size()];
-            return finalFilesList.toArray(str);
-        }
-        return null;
+        return false;
     }
 
-
-    private static void getFolder(File file, Map map) {
-        int folderPos = file.getParent().lastIndexOf("\\") + 1;
-        String folderName = file.getParent().substring(folderPos);
-
-// если ключа нет:
-// 1.заносим имя папки в map
-// 2.заполняем лист
-// 3.добавляем заполненнный лист в map
-//        если ключ есть, заполняем list дальше
-
-        if (!map.containsKey(folderName)) {
-            List<String> files = new ArrayList<>();
-
-            map.put(folderName, files);
-
+    public static TreeMap<Path, String> getFilesFolders(List<Path> foundedFiles) {
+        TreeMap<Path, String> folders = new TreeMap<>();
+        for (Path file : foundedFiles) {
+            String fold = file.getParent().toString();
+            fold = fold.substring(fold.lastIndexOf("\\") + 1);
+            folders.put(file, fold);
         }
+        return folders;
     }
-
 }
