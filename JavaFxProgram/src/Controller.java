@@ -4,47 +4,63 @@ import javafx.fxml.FXML;
 import javafx.fxml.Initializable;
 import javafx.scene.control.*;
 
-import java.io.File;
-import java.io.IOException;
+import java.io.*;
 import java.net.URL;
-import java.nio.file.Files;
-import java.nio.file.Path;
-import java.nio.file.Paths;
-import java.util.Objects;
 import java.util.ResourceBundle;
 
 public class Controller implements Initializable {
-    @FXML
-    public TextField userExtensionTxtFld;
     @FXML
     private Button getFolderButton;
     @FXML
     private Button findText;
     @FXML
+    private Button moveOn;
+    @FXML
+    private Button moveBack;
+    @FXML
+    private Button selectAll;
+    @FXML
+    private Button cancel;
+    @FXML
+    private Button exit;
+    @FXML
+    public TextField userExtensionTxtFld;
+    @FXML
+    private TextField getText;
+    @FXML
     private RadioButton userExtension;
     @FXML
     private RadioButton defaultExtension;
     @FXML
-    private TextField getText;
-    @FXML
     private TreeView treeFiles;
+    @FXML
+    private TextArea fileContent;
+    @FXML
+    private TabPane tabPane;
 
     private TreeItem<String> rootFolder;
-    private TreeItem<String> subFolder;
-    private String fileExtension;
-    private String text;
+    private static String selectedFileName;  //при открытии файла в новой вкладке эта переменная - её имя
+    private static SearchFiles searchFiles;
 
     @Override
     public void initialize(URL location, ResourceBundle resources) {
-        Main.treeFiles = treeFiles;
+        Program.treeFiles = treeFiles;
+        Program.fileContent = fileContent;
     }
 
     @FXML
     public void pressButton(ActionEvent ae) {
         if (ae.getSource() == getFolderButton) {
-            Main.getFolder();
+            Program.getFolder();
         } else if (ae.getSource() == findText) {
-            Main.getInformation(getText.getCharacters().toString(), getExtension());
+            Program.getInformation(getText.getCharacters().toString(), getExtension());
+        } else if (ae.getSource() == cancel) {
+            if (searchFiles != null) {
+                searchFiles.interruptThread();
+            }
+        }
+        else if (ae.getSource() == exit) {
+            System.exit(0);
         }
     }
 
@@ -66,63 +82,141 @@ public class Controller implements Initializable {
         }
     }
 
-    public void newTree(String folder, String extension, String text) {
-        treeFiles = Main.treeFiles;
+    public void newFilesTree(String folder) {
+        treeFiles = Program.treeFiles;
         rootFolder = new TreeItem<>(getName(folder));
-        fileExtension = extension;
-        this.text = text;
-        getSubfolder(new File(folder), rootFolder);
-        treeFiles.setRoot(rootFolder);
 
-        treeFiles.getSelectionModel().selectedItemProperty().addListener
+        //поиск файлов согласно заданным критериям
+        searchFiles = new SearchFiles(new File(folder), rootFolder);
+
+        //отображение иерархии найденных файлов
+        treeFiles.setRoot(rootFolder);
+        getSelectedFilePath(treeFiles, folder);
+    }
+
+    private void getSelectedFilePath(TreeView root, String folder) {
+        //добавляем Listener к TreeView, чтобы получить путь к выделенному файлу
+        root.getSelectionModel().selectedItemProperty().addListener
                 ((ChangeListener<TreeItem<String>>) (changed, oldValue, newValue) -> {
-                    TreeItem<String> parent = newValue.getParent();
-                    StringBuilder str = new StringBuilder(newValue.getValue());
-                    while (!parent.getValue().equals(getName(folder))) {
-                        str.insert(0, parent.getValue() + "\\");
-                        parent = parent.getParent();
+
+                    if (newValue.toString().contains(Program.filesExtension)) { //проверка на то, выбран ли файл или директория
+                        TreeItem<String> parent = newValue.getParent();
+                        StringBuilder path = new StringBuilder(newValue.getValue());
+                        selectedFileName = path.toString();
+
+                        //продолжаем двигаться по иерархии файла, пока не дойдём до папки folder, указанной пользователем
+                        while (!parent.getValue().equals(Controller.getName(folder))) {
+                            path.insert(0, parent.getValue() + "\\");
+                            parent = parent.getParent();
+                        }
+                        showFileData(folder + "\\" + path);
                     }
-                    System.out.println(folder + "\\" + str);
                 });
     }
 
-    private void getSubfolder(File folder, TreeItem parentFolder) {
-        for (File file : Objects.requireNonNull(folder.listFiles())) {
-            String fileName = file.toString();
-            fileName = fileName.substring(fileName.lastIndexOf("\\") + 1);
+    private void showFileData(String filePath) {
+        try (BufferedReader br = new BufferedReader(
+                new InputStreamReader(new FileInputStream(filePath), "CP1251"));) {
+            StringBuilder data = new StringBuilder();
+            String line = br.readLine();
 
-            if ((file.isDirectory())) {
-                if (!folderIsInTree(parentFolder, file)) {
-                    subFolder = new TreeItem<>(fileName);
-                    parentFolder.getChildren().add(subFolder);
-                    getSubfolder(file, subFolder);
-                }
-            } else if (file.isFile() && getContent(file, text) && file.toString().endsWith(fileExtension)) {
-                parentFolder.getChildren().add(new TreeItem<>(fileName));
+            while (line != null) {
+                data.append(line);
+                line = br.readLine();
             }
-        }
-    }
-
-    private static boolean folderIsInTree(TreeItem parentFolder, File folder) {
-        for (Object item : parentFolder.getChildren()) {
-            if (item.toString().equals(folder)) {
-                return true;
-            }
-        }
-        return false;
-    }
-
-    private static boolean getContent(File file, String text) {
-        Path path = Paths.get(file.toURI());
-        try {
-            return new String(Files.readAllBytes(path)).contains(text);
-        } catch (IOException e) {
+            Program.fileContent.setWrapText(true);
+            Program.fileContent.setText(data.toString());
+        } catch (FileNotFoundException e) {
+            System.out.println(e.getMessage());
+            System.out.println(e.getCause());
+        } catch (Exception e) {
             e.printStackTrace();
         }
-        return false;
     }
 
-    private String getName(String name) {
+    @FXML
+    public void textSelectionChange(ActionEvent ae) {
+        String text = fileContent.getText();
+        int from = fileContent.getCaretPosition();
+        int to = text.indexOf(" ", from + 1);
+
+        if (to < 0) {
+            to = text.length();
+            fileContent.selectRange(from + 1, to);
+            return;
+        }
+
+        if (ae.getSource() == moveOn) {
+            shiftPositionAhead(from, to);
+
+           /*  String text = fileContent.getText();
+             String[] words = text.split(" ");
+             int[] positions = new int[words.length];
+             for (int i = 0; i < words.length; i++) {
+                 positions[i] = text.indexOf(words[i]);
+             }
+
+             int from = fileContent.getCaretPosition()+1;
+             int to = 0;
+             int i = 0;
+             do {
+                 if (from > positions[i] && from <= positions[i + 1]) {
+                     from = positions[i];
+                     to = positions[i + 1]-1;
+                     break;
+                 } else {
+                     i++;
+                 }
+             } while (i < positions.length);*/
+        } else if (ae.getSource() == moveBack) {
+            if (from == 0) {
+                fileContent.selectRange(0, text.indexOf(" ", 1));
+                return;
+            }
+
+            int gapAmount = 0;
+            do {
+                String str = text.substring(from, from + 1);
+                if (str.equals(" ") && gapAmount == 0) {
+                    to = from;
+                    gapAmount++;
+                }
+                from--;
+            }
+            while (from > 0 && gapAmount < 2);
+
+            fileContent.selectRange(from, to);
+
+        } else if (ae.getSource() == selectAll) {
+            fileContent.selectRange(0, text.length());
+        }
+    }
+
+    private void shiftPositionAhead(int from, int to) {
+        if (from != 0) {
+            to = fileContent.getCaretPosition() + 1;
+            from = fileContent.getText().indexOf(" ", to);
+        }
+        if (from > to) {
+            int i = from;
+            from = to;
+            to = i;
+        }
+        fileContent.selectRange(from, to);
+    }
+
+    @FXML
+    public void setNewFileTab() {
+        if (selectedFileName != null) {
+            Tab tab = new Tab(selectedFileName);
+            TextArea tabArea = new TextArea(fileContent.getText());
+            tabArea.setWrapText(true);
+            tab.setContent(tabArea);
+            tabPane.getTabs().add(tab);
+        }
+    }
+
+    public static String getName(String name) {
         return name.substring(name.lastIndexOf("\\") + 1);
     }
 }
