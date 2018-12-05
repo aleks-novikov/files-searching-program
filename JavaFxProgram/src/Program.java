@@ -76,6 +76,7 @@ public class Program extends Application {
             Parent root = FXMLLoader.load(getClass().getResource("WindowAppearance.fxml"));
             Scene scene = new Scene(root);
             stage.setScene(scene);
+            stage.setResizable(false);
             stage.show();
         } catch (Exception e) {
             e.printStackTrace();
@@ -111,13 +112,16 @@ public class Program extends Application {
         TreeItem<String> rootFolder = new TreeItem<>(getName(program.getRootFolder()));
         //поиск файлов согласно заданным критериям
         new FilesHierarchyBuild(rootFolder, foundedFiles, program);
+        updateProgramTree(rootFolder);
     }
 
-    public static void updateProgramTree(TreeItem rootFolder) {
+    public static void updateProgramTree(TreeItem root) {
         Runnable updater = () -> {
-            Program.treeFiles.setRoot(rootFolder);
             //отображение иерархии найденных файлов
+            Program.treeFiles.setRoot(root);
             Controller.getSelectedFilePath(program.treeFiles, program.getRootFolder());
+//            TreeViewBuild viewBuild = new TreeViewBuild(root, treeFiles);
+//            Program.treeFiles = viewBuild.getTreeView();
         };
         Platform.runLater(updater);
     }

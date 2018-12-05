@@ -2,6 +2,7 @@ import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
+import java.rmi.UnexpectedException;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.stream.Collectors;
@@ -20,12 +21,14 @@ public class FilesSearching implements Runnable {
     public void run() {
         try {
             filesSearching(rootFolder, text, extension);
+        } catch (UnexpectedException e) {
+            System.out.println(e.getCause() + ", " + e.getMessage());
         } catch (IOException e) {
             e.printStackTrace();
         }
     }
 
-    private void filesSearching(String rootFolder, String text, String extension) throws IOException {
+    private void filesSearching(String rootFolder, String text, String extension) throws IOException, UnexpectedException {
         List<Path> filesPath = Files.walk(Paths.get(rootFolder))
                 .filter(f -> f.toString().endsWith(extension) && getContent(f, text))
                 .collect(Collectors.toList());
@@ -34,6 +37,11 @@ public class FilesSearching implements Runnable {
         for (Path file : filesPath) {
             foundedFiles.add(file.toString().replace(rootFolder + "\\", ""));
         }
+
+        for (String file: foundedFiles) {
+            System.out.println(file);
+        }
+
         Program.newFilesTree (foundedFiles);
     }
 
