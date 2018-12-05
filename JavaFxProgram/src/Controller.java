@@ -4,7 +4,10 @@ import javafx.fxml.FXML;
 import javafx.fxml.Initializable;
 import javafx.scene.control.*;
 
-import java.io.*;
+import java.io.BufferedReader;
+import java.io.FileInputStream;
+import java.io.FileNotFoundException;
+import java.io.InputStreamReader;
 import java.net.URL;
 import java.util.ResourceBundle;
 
@@ -19,8 +22,6 @@ public class Controller implements Initializable {
     private Button moveBack;
     @FXML
     private Button selectAll;
-    @FXML
-    private Button cancel;
     @FXML
     private Button exit;
     @FXML
@@ -38,28 +39,25 @@ public class Controller implements Initializable {
     @FXML
     private TabPane tabPane;
 
-    private TreeItem<String> rootFolder;
+    private Program program;
+//    private static TreeItem<String> rootFolder;
     private static String selectedFileName;  //при открытии файла в новой вкладке эта переменная - её имя
-    private static SearchFiles searchFiles;
 
     @Override
     public void initialize(URL location, ResourceBundle resources) {
+        program = Program.program;
         Program.treeFiles = treeFiles;
         Program.fileContent = fileContent;
     }
 
+
     @FXML
     public void pressButton(ActionEvent ae) {
         if (ae.getSource() == getFolderButton) {
-            Program.getFolder();
+            program.getFolder();
         } else if (ae.getSource() == findText) {
-            Program.getInformation(getText.getCharacters().toString(), getExtension());
-        } else if (ae.getSource() == cancel) {
-            if (searchFiles != null) {
-                searchFiles.interruptThread();
-            }
-        }
-        else if (ae.getSource() == exit) {
+            program.getInformation(getText.getCharacters().toString(), getExtension());
+        } else if (ae.getSource() == exit) {
             System.exit(0);
         }
     }
@@ -82,39 +80,29 @@ public class Controller implements Initializable {
         }
     }
 
-    public void newFilesTree(String folder) {
-        treeFiles = Program.treeFiles;
-        rootFolder = new TreeItem<>(getName(folder));
-
-        //поиск файлов согласно заданным критериям
-        searchFiles = new SearchFiles(new File(folder), rootFolder);
-
-        //отображение иерархии найденных файлов
-        treeFiles.setRoot(rootFolder);
-        getSelectedFilePath(treeFiles, folder);
-    }
-
-    private void getSelectedFilePath(TreeView root, String folder) {
+    public static void getSelectedFilePath(TreeView root, String folder) {
         //добавляем Listener к TreeView, чтобы получить путь к выделенному файлу
         root.getSelectionModel().selectedItemProperty().addListener
                 ((ChangeListener<TreeItem<String>>) (changed, oldValue, newValue) -> {
 
-                    if (newValue.toString().contains(Program.filesExtension)) { //проверка на то, выбран ли файл или директория
-                        TreeItem<String> parent = newValue.getParent();
-                        StringBuilder path = new StringBuilder(newValue.getValue());
-                        selectedFileName = path.toString();
+                    if (newValue.toString() != null) {
+                        if (newValue.toString().contains(Program.filesExtension)) { //проверка на то, выбран ли файл или директория
+                            TreeItem<String> parent = newValue.getParent();
+                            StringBuilder path = new StringBuilder(newValue.getValue());
+                            selectedFileName = path.toString();
 
-                        //продолжаем двигаться по иерархии файла, пока не дойдём до папки folder, указанной пользователем
-                        while (!parent.getValue().equals(Controller.getName(folder))) {
-                            path.insert(0, parent.getValue() + "\\");
-                            parent = parent.getParent();
+                            //продолжаем двигаться по иерархии файла, пока не дойдём до папки folder, указанной пользователем
+                            while (!parent.getValue().equals(Controller.getName(folder))) {
+                                path.insert(0, parent.getValue() + "\\");
+                                parent = parent.getParent();
+                            }
+                            showFileData(folder + "\\" + path);
                         }
-                        showFileData(folder + "\\" + path);
                     }
                 });
     }
 
-    private void showFileData(String filePath) {
+    private static void showFileData(String filePath) {
         try (BufferedReader br = new BufferedReader(
                 new InputStreamReader(new FileInputStream(filePath), "CP1251"));) {
             StringBuilder data = new StringBuilder();

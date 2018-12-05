@@ -2,7 +2,7 @@
 
 <?import javafx.scene.control.*?>
 <?import javafx.scene.layout.*?>
-<GridPane alignment="center" hgap="10" prefHeight="449.0" prefWidth="473.0" vgap="10" xmlns="http://javafx.com/javafx/8.0.171" xmlns:fx="http://javafx.com/fxml/1" fx:controller="Controller">
+<GridPane alignment="center" hgap="10" prefHeight="449.0" prefWidth="570.0" vgap="10" xmlns="http://javafx.com/javafx/8.0.171" xmlns:fx="http://javafx.com/fxml/1" fx:controller="Controller">
     <columnConstraints>
         <ColumnConstraints />
     </columnConstraints>
@@ -10,7 +10,7 @@
         <RowConstraints maxHeight="521.0" minHeight="402.0" prefHeight="430.0" />
         <RowConstraints maxHeight="119.0" minHeight="0.0" prefHeight="9.0" />
     </rowConstraints>
-   <TabPane fx:id="tabPane" prefHeight="430.0" prefWidth="451.0">
+   <TabPane fx:id="tabPane" prefHeight="430.0" prefWidth="470.0">
       <tabs>
          <Tab closable="false" text="Поиск файлов">
             <content>
@@ -22,12 +22,12 @@
                      <Label layoutX="201.0" layoutY="73.0" prefHeight="17.0" prefWidth="144.0" text="Введите текст для поиска:" />
                      <TextField fx:id="getText" layoutX="366.0" layoutY="69.0" prefHeight="25.0" prefWidth="71.0" />
                      <Label layoutX="202.0" layoutY="107.0" prefHeight="17.0" prefWidth="185.0" text="Выберите расширение файлов:" />
-                     <RadioButton fx:id="defaultExtension" layoutX="200.0" layoutY="129.0" mnemonicParsing="false" onAction="#radioBtnChanged" prefHeight="17.0" prefWidth="45.0" selected="true" text="txt">
+                     <RadioButton fx:id="defaultExtension" layoutX="200.0" layoutY="129.0" mnemonicParsing="false" onAction="#radioBtnChanged" prefHeight="4.0" prefWidth="45.0" selected="true" text="txt">
                         <toggleGroup>
                            <ToggleGroup fx:id="RadioGroup" />
                         </toggleGroup>
                      </RadioButton>
-                     <RadioButton fx:id="userExtension" layoutX="249.0" layoutY="129.0" mnemonicParsing="false" onAction="#radioBtnChanged" prefHeight="17.0" prefWidth="66.0" text="другое:" toggleGroup="$RadioGroup" />
+                     <RadioButton fx:id="userExtension" layoutX="249.0" layoutY="129.0" mnemonicParsing="false" onAction="#radioBtnChanged" prefHeight="0.0" prefWidth="66.0" text="другое:" toggleGroup="$RadioGroup" />
                      <TextField fx:id="userExtensionTxtFld" disable="true" layoutX="322.0" layoutY="125.0" prefHeight="25.0" prefWidth="45.0" />
                      <AnchorPane layoutX="-48.0" layoutY="234.0" prefHeight="156.0" prefWidth="519.0" AnchorPane.leftAnchor="-48.0">
                         <children>
@@ -38,11 +38,10 @@
                            <TextArea fx:id="fileContent" layoutX="68.0" layoutY="14.0" prefHeight="99.0" prefWidth="416.0" />
                         </children>
                      </AnchorPane>
-                     <Button fx:id="cancel" layoutX="256.0" layoutY="166.0" mnemonicParsing="false" onAction="#pressButton" text="Отмена" />
-                     <Label layoutX="14.0" layoutY="14.0" text="Результаты поиска:" />
+                     <Label layoutX="17.0" layoutY="14.0" prefHeight="17.0" prefWidth="116.0" text="Результаты поиска:" />
                      <TreeView fx:id="treeFiles" layoutX="18.0" layoutY="36.0" prefHeight="159.0" prefWidth="160.0" />
-                     <Separator layoutY="196.0" prefHeight="25.0" prefWidth="545.0" />
-                     <Button fx:id="exit" layoutX="326.0" layoutY="166.0" mnemonicParsing="false" onAction="#pressButton" text="Выход" />
+                     <Separator layoutX="14.0" layoutY="201.0" prefHeight="25.0" prefWidth="421.0" />
+                     <Button fx:id="exit" layoutX="282.0" layoutY="166.0" mnemonicParsing="false" onAction="#pressButton" text="Выход" />
                      <Label layoutX="21.0" layoutY="225.0" text="Содержимое файла:" />
                   </children>
                </AnchorPane>
