@@ -1,3 +1,4 @@
+import javafx.application.Platform;
 import javafx.beans.value.ChangeListener;
 import javafx.event.ActionEvent;
 import javafx.fxml.FXML;
@@ -40,8 +41,7 @@ public class Controller implements Initializable {
     private TabPane tabPane;
 
     private Program program;
-//    private static TreeItem<String> rootFolder;
-    private static String selectedFileName;  //при открытии файла в новой вкладке эта переменная - её имя
+    private static String selectedFileName;
 
     @Override
     public void initialize(URL location, ResourceBundle resources) {
@@ -49,7 +49,6 @@ public class Controller implements Initializable {
         Program.treeFiles = treeFiles;
         Program.fileContent = fileContent;
     }
-
 
     @FXML
     public void pressButton(ActionEvent ae) {
@@ -80,31 +79,29 @@ public class Controller implements Initializable {
         }
     }
 
-    public static void getSelectedFilePath(TreeView root, String folder) {
+    static void getSelectedFilePath(TreeView root, String folder) {
         //добавляем Listener к TreeView, чтобы получить путь к выделенному файлу
         root.getSelectionModel().selectedItemProperty().addListener
                 ((ChangeListener<TreeItem<String>>) (changed, oldValue, newValue) -> {
 
-                    if (newValue.toString() != null) {
-                        if (newValue.toString().contains(Program.filesExtension)) { //проверка на то, выбран ли файл или директория
-                            TreeItem<String> parent = newValue.getParent();
-                            StringBuilder path = new StringBuilder(newValue.getValue());
-                            selectedFileName = path.toString();
+                    if ((newValue != null) && (newValue.toString().contains(Program.filesExtension))) {
+                        TreeItem<String> parent = newValue.getParent();
+                        StringBuilder path = new StringBuilder(newValue.getValue());
+                        selectedFileName = path.toString();
 
-                            //продолжаем двигаться по иерархии файла, пока не дойдём до папки folder, указанной пользователем
-                            while (!parent.getValue().equals(Controller.getName(folder))) {
-                                path.insert(0, parent.getValue() + "\\");
-                                parent = parent.getParent();
-                            }
-                            showFileData(folder + "\\" + path);
+                        //продолжаем двигаться по иерархии файла, пока не дойдём до папки folder, указанной пользователем
+                        while (!parent.getValue().equals(Controller.getName(folder))) {
+                            path.insert(0, parent.getValue() + "\\");
+                            parent = parent.getParent();
                         }
+                        showFileData(folder + "\\" + path);
                     }
                 });
     }
 
     private static void showFileData(String filePath) {
         try (BufferedReader br = new BufferedReader(
-                new InputStreamReader(new FileInputStream(filePath), "CP1251"));) {
+                new InputStreamReader(new FileInputStream(filePath), "CP1251"))) {
             StringBuilder data = new StringBuilder();
             String line = br.readLine();
 
@@ -115,82 +112,44 @@ public class Controller implements Initializable {
             Program.fileContent.setWrapText(true);
             Program.fileContent.setText(data.toString());
         } catch (FileNotFoundException e) {
-            System.out.println(e.getMessage());
-            System.out.println(e.getCause());
+            System.out.println(e.getMessage() + ", " + e.getCause());
         } catch (Exception e) {
             e.printStackTrace();
         }
     }
 
     @FXML
-    public void textSelectionChange(ActionEvent ae) {
-        String text = fileContent.getText();
+    public void selectFoundedText(ActionEvent ae) {
+        String allText = fileContent.getText();
+
+        if (allText.equals("")) {
+            Runnable message = () -> Program.showMessage("Для навигации по найденному тексту, пожалуйста, выберите файл");
+            Platform.runLater(message);
+        }
+
+        String searchedText = program.getSearchedText();
         int from = fileContent.getCaretPosition();
-        int to = text.indexOf(" ", from + 1);
-
-        if (to < 0) {
-            to = text.length();
-            fileContent.selectRange(from + 1, to);
-            return;
-        }
-
+        int to;
         if (ae.getSource() == moveOn) {
-            shiftPositionAhead(from, to);
-
-           /*  String text = fileContent.getText();
-             String[] words = text.split(" ");
-             int[] positions = new int[words.length];
-             for (int i = 0; i < words.length; i++) {
-                 positions[i] = text.indexOf(words[i]);
-             }
-
-             int from = fileContent.getCaretPosition()+1;
-             int to = 0;
-             int i = 0;
-             do {
-                 if (from > positions[i] && from <= positions[i + 1]) {
-                     from = positions[i];
-                     to = positions[i + 1]-1;
-                     break;
-                 } else {
-                     i++;
-                 }
-             } while (i < positions.length);*/
+            from = allText.indexOf(searchedText, from + 1);
+            if (from == -1) {
+                from = allText.indexOf(searchedText);
+            }
         } else if (ae.getSource() == moveBack) {
-            if (from == 0) {
-                fileContent.selectRange(0, text.indexOf(" ", 1));
-                return;
+            if (from != 0) {
+                allText = allText.substring(0, from - 1);
             }
-
-            int gapAmount = 0;
-            do {
-                String str = text.substring(from, from + 1);
-                if (str.equals(" ") && gapAmount == 0) {
-                    to = from;
-                    gapAmount++;
-                }
-                from--;
+            from = allText.lastIndexOf(searchedText);
+            if (from == -1) {
+                from = fileContent.getText().lastIndexOf(searchedText);
             }
-            while (from > 0 && gapAmount < 2);
-
-            fileContent.selectRange(from, to);
-
-        } else if (ae.getSource() == selectAll) {
-            fileContent.selectRange(0, text.length());
         }
-    }
-
-    private void shiftPositionAhead(int from, int to) {
-        if (from != 0) {
-            to = fileContent.getCaretPosition() + 1;
-            from = fileContent.getText().indexOf(" ", to);
-        }
-        if (from > to) {
-            int i = from;
-            from = to;
-            to = i;
-        }
+        to = from + searchedText.length();
         fileContent.selectRange(from, to);
+
+        if (ae.getSource() == selectAll) {
+            fileContent.selectRange(0, allText.length());
+        }
     }
 
     @FXML
@@ -200,11 +159,12 @@ public class Controller implements Initializable {
             TextArea tabArea = new TextArea(fileContent.getText());
             tabArea.setWrapText(true);
             tab.setContent(tabArea);
+            tabPane.getSelectionModel().select(tab);
             tabPane.getTabs().add(tab);
         }
     }
 
-    public static String getName(String name) {
+    private static String getName(String name) {
         return name.substring(name.lastIndexOf("\\") + 1);
     }
 }

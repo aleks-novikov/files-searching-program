@@ -15,57 +15,51 @@ import java.util.List;
 
 public class Program extends Application {
     public static Program program;
-    public static TreeView treeFiles;
-    public static TextArea fileContent;
-
-    /*    public static String rootFolder;
-        public static String searchedText;
-        public static String filesExtension;
-        public static Stage stage;*/
-    public static String filesExtension;
+    static TreeView treeFiles;
+    static TextArea fileContent;
+    static String filesExtension;
     private Stage stage;
     private String rootFolder;
     private String searchedText;
-//    private String filesExtension;
 
     public static void main(String[] args) {
         new Program().programStart();
     }
 
-    void programStart() {
+    private void programStart() {
         program = this;
         launch();
     }
 
-    public void setStage(Stage stage) {
+    private void setStage(Stage stage) {
         this.stage = stage;
     }
 
-    public void setRootFolder(String rootFolder) {
+    private void setRootFolder(String rootFolder) {
         this.rootFolder = rootFolder;
     }
 
-    public void setSearchedText(String searchedText) {
+    private void setSearchedText(String searchedText) {
         this.searchedText = searchedText;
     }
 
-    public void setFilesExtension(String filesExtension) {
-        this.filesExtension = filesExtension;
+    private void setFilesExtension(String filesExtension) {
+        Program.filesExtension = filesExtension;
     }
 
-    public Stage getStage() {
+    private Stage getStage() {
         return stage;
     }
 
-    public String getRootFolder() {
+    private String getRootFolder() {
         return rootFolder;
     }
 
-    public String getSearchedText() {
+    String getSearchedText() {
         return searchedText;
     }
 
-    public String getFilesExtension() {
+    private String getFilesExtension() {
         return filesExtension;
     }
 
@@ -75,30 +69,29 @@ public class Program extends Application {
             program.setStage(stage);
             Parent root = FXMLLoader.load(getClass().getResource("WindowAppearance.fxml"));
             Scene scene = new Scene(root);
-            stage.setScene(scene);
+            stage.setTitle("Поиск файлов");
             stage.setResizable(false);
+            stage.setScene(scene);
             stage.show();
         } catch (Exception e) {
             e.printStackTrace();
         }
     }
 
-    public void getFolder() {
+    void getFolder() {
         final DirectoryChooser dirChooser = new DirectoryChooser();
-        File initFolder = new File("G:\\Java");
+        File initFolder = new File(System.getProperty("user.dir"));
         dirChooser.setInitialDirectory(initFolder);
-        this.setRootFolder(dirChooser.showDialog(this.getStage()).toString());
-        if (rootFolder == null) {
-            showMessage("Пожалуйста, выберите папку");
-        }
+        String choosenPath = dirChooser.showDialog(this.getStage()).toString();
+        this.setRootFolder(choosenPath);
     }
 
-    public void getInformation(String searchedText, String filesExtension) {
-        this.setSearchedText("Java");
-        this.setFilesExtension("txt");
-        this.setRootFolder("G:\\Java");
+    void getInformation(String searchedText, String filesExtension) {
+        this.setSearchedText(searchedText);
+        this.setFilesExtension(filesExtension);
         if (this.getRootFolder() == null) {
             showMessage("Пожалуйста, выберите папку");
+            getFolder();
         } else if (this.getSearchedText().equals("")) {
             showMessage("Пожалуйста, введите текст для поиска");
         } else if (this.getFilesExtension().equals("")) {
@@ -111,22 +104,20 @@ public class Program extends Application {
     static void newFilesTree(List foundedFiles) {
         TreeItem<String> rootFolder = new TreeItem<>(getName(program.getRootFolder()));
         //поиск файлов согласно заданным критериям
-        new FilesHierarchyBuild(rootFolder, foundedFiles, program);
+        new FilesHierarchyBuild(rootFolder, foundedFiles, program.getFilesExtension()).start();
         updateProgramTree(rootFolder);
     }
 
-    public static void updateProgramTree(TreeItem root) {
+    private static void updateProgramTree(TreeItem root) {
         Runnable updater = () -> {
             //отображение иерархии найденных файлов
             Program.treeFiles.setRoot(root);
             Controller.getSelectedFilePath(program.treeFiles, program.getRootFolder());
-//            TreeViewBuild viewBuild = new TreeViewBuild(root, treeFiles);
-//            Program.treeFiles = viewBuild.getTreeView();
         };
         Platform.runLater(updater);
     }
 
-    private static void showMessage(String message) {
+    static void showMessage(String message) {
         Alert alert = new Alert(Alert.AlertType.INFORMATION);
         alert.setHeaderText(null);
         alert.setContentText(message);

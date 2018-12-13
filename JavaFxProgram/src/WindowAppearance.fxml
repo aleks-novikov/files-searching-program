@@ -2,51 +2,60 @@
 
 <?import javafx.scene.control.*?>
 <?import javafx.scene.layout.*?>
-<GridPane alignment="center" hgap="10" maxWidth="-Infinity" minWidth="-Infinity" prefHeight="411.0" prefWidth="449.0" vgap="10" xmlns="http://javafx.com/javafx/8.0.171" xmlns:fx="http://javafx.com/fxml/1" fx:controller="Controller">
+<GridPane alignment="center" hgap="10" maxWidth="-Infinity" minWidth="-Infinity" prefHeight="518.0" prefWidth="449.0" vgap="10" xmlns="http://javafx.com/javafx/8.0.171" xmlns:fx="http://javafx.com/fxml/1" fx:controller="Controller">
     <columnConstraints>
         <ColumnConstraints />
     </columnConstraints>
     <rowConstraints>
-        <RowConstraints maxHeight="521.0" minHeight="402.0" prefHeight="410.0" />
-        <RowConstraints maxHeight="119.0" minHeight="0.0" prefHeight="8.0" />
+        <RowConstraints maxHeight="76.0" minHeight="0.0" prefHeight="0.0" />
+        <RowConstraints maxHeight="539.0" minHeight="142.0" prefHeight="502.0" />
     </rowConstraints>
-   <TabPane fx:id="tabPane" prefHeight="454.0" prefWidth="449.0">
-      <tabs>
-         <Tab closable="false" text="Поиск файлов">
-            <content>
-               <AnchorPane minWidth="-Infinity" prefHeight="547.0" prefWidth="449.0">
-                  <children>
-                     <Button fx:id="findText" layoutX="214.0" layoutY="165.0" mnemonicParsing="false" onAction="#pressButton" prefHeight="25.0" prefWidth="67.0" text="Найти" />
-                     <Button fx:id="getFolderButton" layoutX="367.0" layoutY="35.0" mnemonicParsing="false" onAction="#pressButton" prefHeight="25.0" prefWidth="70.0" text="Выбрать" />
-                     <Label layoutX="202.0" layoutY="39.0" prefHeight="17.0" prefWidth="164.0" text="Выберите папку для поиска:" />
-                     <Label layoutX="201.0" layoutY="73.0" prefHeight="17.0" prefWidth="144.0" text="Введите текст для поиска:" />
-                     <TextField fx:id="getText" layoutX="366.0" layoutY="69.0" prefHeight="25.0" prefWidth="71.0" />
-                     <Label layoutX="201.0" layoutY="107.0" prefHeight="17.0" prefWidth="185.0" text="Выберите расширение файлов:" />
-                     <RadioButton fx:id="defaultExtension" layoutX="202.0" layoutY="132.0" mnemonicParsing="false" onAction="#radioBtnChanged" prefHeight="4.0" prefWidth="45.0" selected="true" text="txt">
-                        <toggleGroup>
-                           <ToggleGroup fx:id="RadioGroup" />
-                        </toggleGroup>
-                     </RadioButton>
-                     <RadioButton fx:id="userExtension" layoutX="251.0" layoutY="132.0" mnemonicParsing="false" onAction="#radioBtnChanged" prefHeight="0.0" prefWidth="66.0" text="другое:" toggleGroup="$RadioGroup" />
-                     <TextField fx:id="userExtensionTxtFld" disable="true" layoutX="329.0" layoutY="128.0" prefHeight="25.0" prefWidth="45.0" />
-                     <AnchorPane layoutX="-48.0" layoutY="234.0" prefHeight="180.0" prefWidth="519.0" AnchorPane.leftAnchor="-48.0">
-                        <children>
-                           <Button fx:id="moveOn" layoutX="61.0" layoutY="109.0" mnemonicParsing="false" onAction="#textSelectionChange" prefHeight="24.0" prefWidth="61.0" text="Вперёд" />
-                           <Button fx:id="moveBack" layoutX="137.0" layoutY="109.0" mnemonicParsing="false" onAction="#textSelectionChange" prefHeight="25.0" prefWidth="61.0" text="Назад" />
-                           <Button fx:id="selectAll" layoutX="216.0" layoutY="109.0" mnemonicParsing="false" onAction="#textSelectionChange" prefHeight="25.0" prefWidth="91.0" text="Выделить всё" />
-                           <Button layoutX="319.0" layoutY="109.0" mnemonicParsing="false" onAction="#setNewFileTab" prefHeight="25.0" prefWidth="158.0" text="Открыть в новой вкладке" />
-                           <TextArea fx:id="fileContent" layoutX="58.0" prefHeight="103.0" prefWidth="422.0" />
-                        </children>
-                     </AnchorPane>
-                     <Label layoutX="17.0" layoutY="14.0" prefHeight="17.0" prefWidth="116.0" text="Результаты поиска:" />
-                     <TreeView fx:id="treeFiles" layoutX="14.0" layoutY="36.0" prefHeight="159.0" prefWidth="172.0" />
-                     <Separator layoutX="14.0" layoutY="195.0" prefHeight="25.0" prefWidth="421.0" />
-                     <Label layoutX="19.0" layoutY="212.0" text="Содержимое файла:" />
-                     <Button fx:id="exit" layoutX="306.0" layoutY="165.0" minWidth="-Infinity" mnemonicParsing="false" onAction="#pressButton" prefHeight="25.0" prefWidth="68.0" text="Выход" />
-                  </children>
-               </AnchorPane>
-            </content>
-         </Tab>
-      </tabs>
+   <TabPane fx:id="tabPane" prefHeight="576.0" prefWidth="449.0" GridPane.rowIndex="1">
+      <Tab closable="false" text="Поиск файлов">
+         <AnchorPane minWidth="-Infinity" prefHeight="624.0" prefWidth="449.0">
+            <Button fx:id="findText" layoutX="214.0" layoutY="172.0" mnemonicParsing="false"
+                    onAction="#pressButton" prefHeight="25.0" prefWidth="67.0" text="Найти"/>
+            <Button fx:id="getFolderButton" layoutX="367.0" layoutY="35.0" mnemonicParsing="false"
+                    onAction="#pressButton" prefHeight="25.0" prefWidth="70.0" text="Выбрать"/>
+            <Label layoutX="202.0" layoutY="39.0" prefHeight="17.0" prefWidth="164.0"
+                   text="Выберите папку для поиска:"/>
+            <Label layoutX="201.0" layoutY="73.0" prefHeight="17.0" prefWidth="144.0"
+                   text="Введите текст для поиска:"/>
+            <TextField fx:id="getText" layoutX="366.0" layoutY="69.0" prefHeight="25.0" prefWidth="71.0"/>
+            <Label layoutX="201.0" layoutY="107.0" prefHeight="17.0" prefWidth="185.0"
+                   text="Выберите расширение файлов:"/>
+            <RadioButton fx:id="defaultExtension" layoutX="202.0" layoutY="132.0" mnemonicParsing="false"
+                         onAction="#radioBtnChanged" prefHeight="4.0" prefWidth="45.0" selected="true" text="log">
+               <toggleGroup>
+                  <ToggleGroup fx:id="RadioGroup"/>
+               </toggleGroup>
+            </RadioButton>
+            <RadioButton fx:id="userExtension" layoutX="251.0" layoutY="132.0" mnemonicParsing="false"
+                         onAction="#radioBtnChanged" prefHeight="0.0" prefWidth="66.0" text="другое:"
+                         toggleGroup="$RadioGroup"/>
+            <TextField fx:id="userExtensionTxtFld" disable="true" layoutX="329.0" layoutY="128.0"
+                       prefHeight="25.0" prefWidth="45.0"/>
+            <AnchorPane layoutX="-48.0" layoutY="234.0" prefHeight="202.0" prefWidth="519.0"
+                        AnchorPane.leftAnchor="-48.0">
+               <Button fx:id="moveOn" layoutX="63.0" layoutY="197.0" mnemonicParsing="false"
+                       onAction="#selectFoundedText" prefHeight="25.0" prefWidth="59.0" text="Вперёд"/>
+               <Button fx:id="moveBack" layoutX="137.0" layoutY="197.0" mnemonicParsing="false"
+                       onAction="#selectFoundedText" prefHeight="25.0" prefWidth="61.0" text="Назад"/>
+               <Button fx:id="selectAll" layoutX="216.0" layoutY="197.0" mnemonicParsing="false"
+                       onAction="#selectFoundedText" prefHeight="25.0" prefWidth="91.0" text="Выделить всё"/>
+               <Button layoutX="319.0" layoutY="197.0" mnemonicParsing="false" onAction="#setNewFileTab"
+                       prefHeight="25.0" prefWidth="162.0" text="Открыть в новой вкладке"/>
+               <TextArea fx:id="fileContent" layoutX="63.0" layoutY="18.0" prefHeight="172.0" prefWidth="418.0"
+                         text="&#10;&#10;"/>
+               <Label layoutX="64.0" layoutY="-8.0" prefHeight="17.0" prefWidth="117.0"
+                      text="Содержимое файла:"/>
+            </AnchorPane>
+            <Label layoutX="17.0" layoutY="14.0" prefHeight="17.0" prefWidth="116.0" text="Результаты поиска:"/>
+            <TreeView fx:id="treeFiles" layoutX="14.0" layoutY="36.0" prefHeight="164.0" prefWidth="172.0"/>
+            <Button fx:id="exit" layoutX="306.0" layoutY="172.0" minWidth="-Infinity" mnemonicParsing="false"
+                    onAction="#pressButton" prefHeight="25.0" prefWidth="68.0" text="Выход"/>
+            <Separator layoutX="20.0" layoutY="205.0" prefHeight="25.0" prefWidth="421.0"/>
+         </AnchorPane>
+      </Tab>
    </TabPane>
 </GridPane>
