@@ -148,6 +148,7 @@ public class Controller implements Initializable {
         fileContent.selectRange(from, to);
 
         if (ae.getSource() == selectAll) {
+            //TODO реализовать функционал с помощью сторонней библиотеки, textArea JavaFx не поддерживает выделение нескольких слов одновременно
             fileContent.selectRange(0, allText.length());
         }
     }
